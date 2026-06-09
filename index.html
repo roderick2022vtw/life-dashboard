@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0e0f11;
+  --bg2: #16181c;
+  --bg3: #1e2026;
+  --bg4: #26292f;
+  --border: #2e3138;
+  --border2: #3a3e47;
+  --text: #e8eaf0;
+  --text2: #9095a0;
+  --text3: #5a5f6b;
+  --accent: #c8f060;
+  --accent2: #a8d840;
+  --blue: #5b9cf6;
+  --blue-bg: #1a2535;
+  --green: #4ade80;
+  --green-bg: #0d2318;
+  --amber: #fbbf24;
+  --amber-bg: #231a07;
+  --red: #f87171;
+  --red-bg: #220d0d;
+  --purple: #a78bfa;
+  --purple-bg: #1a1530;
+  --teal: #2dd4bf;
+  --teal-bg: #0a2520;
+  --coral: #fb7185;
+  --coral-bg: #2a1018;
+  --r: 10px;
+  --r-lg: 16px;
+  --font: 'Syne', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;display:flex;}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;
+  padding:0 0 24px;
+}
+.sidebar-logo{
+  padding:20px 20px 16px;border-bottom:1px solid var(--border);
+}
+.sidebar-logo-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.sidebar-logo-title span{color:var(--accent);}
+.sidebar-logo-sub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:2px;}
+.nav-section{padding:16px 12px 0;}
+.nav-section-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);padding:0 8px;margin-bottom:6px;}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:8px 8px;border-radius:var(--r);
+  cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all .15s;
+  border:none;background:none;width:100%;text-align:left;font-family:var(--font);
+}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:var(--bg3);color:var(--text);}
+.nav-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;font-size:10px;font-family:var(--mono);
+  background:var(--bg4);padding:1px 7px;border-radius:20px;color:var(--text3);
+}
+.nav-item.active .nav-badge{background:var(--accent);color:#0e0f11;font-weight:600;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;}
+.page{display:none;padding:28px 32px;max-width:1200px;}
+.page.active{display:block;}
+
+/* PAGE HEADER */
+.page-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap;}
+.page-hd-left h2{font-size:24px;font-weight:700;letter-spacing:-.3px;color:var(--text);}
+.page-hd-left h2 span{color:var(--accent);}
+.page-hd-sub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;}
+.card-title{
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);font-family:var(--mono);margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.ctd{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:7px;flex-shrink:0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.fw{margin-bottom:14px;}
+
+/* STAT CARDS */
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.stat-label{font-size:10px;font-family:var(--mono);color:var(--text3);margin-bottom:5px;letter-spacing:.06em;text-transform:uppercase;}
+.stat-val{font-size:26px;font-weight:700;font-family:var(--mono);line-height:1;}
+.stat-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:4px;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;margin-bottom:18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;}
+.tab{flex:1;padding:7px 8px;text-align:center;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text3);transition:all .15s;}
+.tab:hover{color:var(--text2);}
+.tab.active{background:var(--bg4);color:var(--text);}
+.tc{display:none;}
+.tc.active{display:block;}
+
+/* HABITS */
+.habit-list{display:flex;flex-direction:column;gap:7px;}
+.habit-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);
+  cursor:pointer;transition:border-color .15s,background .15s;user-select:none;
+}
+.habit-row:hover{border-color:var(--border2);}
+.habit-row.done{background:#131a0d;border-color:#2a4015;}
+.habit-check{
+  width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;font-size:11px;color:transparent;
+}
+.habit-row.done .habit-check{background:var(--accent);border-color:var(--accent);color:#0e0f11;}
+.habit-name{font-size:13px;font-weight:500;color:var(--text);flex:1;}
+.habit-row.done .habit-name{color:var(--text2);}
+.habit-target{font-size:11px;color:var(--text3);font-family:var(--mono);}
+
+/* WORKOUT GRID */
+.workout-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.wbtn{
+  padding:10px 6px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);font-family:var(--font);
+  font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .15s;
+}
+.wbtn:hover{border-color:var(--border2);color:var(--text);}
+.wbtn.au{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);}
+.wbtn.al{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.wbtn.ar{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
+.wbtn.ab{background:var(--purple-bg);border-color:var(--purple);color:var(--purple);}
+.wbtn.ax{background:var(--bg4);border-color:var(--border2);color:var(--text2);}
+
+/* METRICS */
+.metric-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:5px;}
+.metric-lbl{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.07em;text-transform:uppercase;}
+.metric-row-in{display:flex;align-items:center;gap:6px;}
+.metric-row-in input{background:transparent;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:22px;font-weight:500;width:100%;-moz-appearance:textfield;}
+.metric-row-in input::-webkit-inner-spin-button,.metric-row-in input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.metric-unit-lbl{font-size:12px;color:var(--text3);font-family:var(--mono);flex-shrink:0;}
+.mbar{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.mbar-fill{height:100%;border-radius:2px;transition:width .3s;background:var(--accent);}
+
+/* WEEK STRIP */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+.week-day{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+  padding:10px 6px;text-align:center;cursor:pointer;transition:border-color .15s;
+}
+.week-day:hover{border-color:var(--border2);}
+.week-day.today{border-color:var(--accent);}
+.week-day.selected{border-color:var(--blue);background:var(--blue-bg);}
+.wdn{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.wdd{font-size:16px;font-weight:600;color:var(--text);margin-bottom:5px;font-family:var(--mono);}
+.week-day.today .wdd{color:var(--accent);}
+.wdots{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;min-height:14px;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--border2);}
+.dot.on{background:var(--accent);}
+.wwtag{margin-top:5px;font-size:9px;font-family:var(--mono);padding:2px 5px;border-radius:4px;display:inline-block;}
+
+/* STREAKS */
+.streak-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.streak-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;align-items:center;gap:10px;}
+.streak-num{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--accent);line-height:1;}
+.streak-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:1px;}
+.streak-sub{font-size:10px;font-family:var(--mono);color:var(--text3);}
+
+/* HEATMAP */
+.hmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.hmap-lbls{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;}
+.hmap-lbl{text-align:center;font-size:9px;font-family:var(--mono);color:var(--text3);}
+.hmap-cell{aspect-ratio:1;border-radius:4px;background:var(--bg4);cursor:pointer;transition:opacity .15s;}
+.hmap-cell.empty{background:transparent;cursor:default;}
+.hmap-cell.l1{background:#14532d;}
+.hmap-cell.l2{background:#166534;}
+.hmap-cell.l3{background:var(--accent);}
+
+/* PROGRESS BARS */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.prog-lbl{font-size:12px;color:var(--text2);width:130px;flex-shrink:0;}
+.prog-bar{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .4s;}
+.prog-pct{font-size:11px;font-family:var(--mono);color:var(--text3);width:32px;text-align:right;}
+
+/* CHART */
+.chart-wrap{position:relative;height:160px;}
+
+/* PLAN */
+.plan-cell{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+.plan-cell:hover{border-color:var(--border2);}
+.plan-cell.sel{border-color:var(--accent);background:#131a0d;}
+.pc-day{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
+.pc-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.ex-table{width:100%;border-collapse:collapse;}
+.ex-table th{font-size:10px;font-family:var(--mono);color:var(--text3);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);letter-spacing:.06em;text-transform:uppercase;}
+.ex-table td{font-size:13px;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.ex-table tr:last-child td{border-bottom:none;}
+.ex-table tr:nth-child(even) td{background:var(--bg3);}
+.ex-num{color:var(--text3);font-family:var(--mono);font-size:11px;width:24px;}
+.ex-sets{font-family:var(--mono);font-size:12px;color:var(--text2);text-align:right;white-space:nowrap;}
+.ex-note{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.plan-note{background:var(--bg3);border-left:2px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px;}
+.plan-note strong{color:var(--text);}
+
+/* IMPORT/EXPORT */
+.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:#131a0d;}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.import-log{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-size:11px;font-family:var(--mono);color:var(--text2);height:80px;overflow-y:auto;line-height:1.6;margin-top:10px;}
+.btn{padding:9px 16px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-acc{background:var(--accent);color:#0e0f11;border-color:var(--accent);font-weight:600;}
+.btn-acc:hover{background:var(--accent2);border-color:var(--accent2);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* BADGE */
+.badge{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:20px;letter-spacing:.04em;}
+.b-green{background:var(--green-bg);color:var(--green);border:1px solid #1a4530;}
+.b-amber{background:var(--amber-bg);color:var(--amber);border:1px solid #3a2a0a;}
+.b-red{background:var(--red-bg);color:var(--red);border:1px solid #3a1515;}
+
+/* WEEK-PLAN ROWS */
+.wrow{display:grid;grid-template-columns:80px 1fr;border-bottom:1px solid var(--border);}
+.wrow:last-child{border-bottom:none;}
+.wrl{padding:10px 12px 10px 0;font-size:11px;font-family:var(--mono);color:var(--text2);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
+.wrl strong{color:var(--text);}
+.wrc{padding:10px 0 10px 14px;}
+.wrc-t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.wrc-s{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* RULE ITEMS */
+.rule-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.rule-item:last-child{border-bottom:none;}
+.rule-n{width:22px;height:22px;border-radius:50%;background:var(--purple-bg);color:var(--purple);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.rule-t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.rule-s{font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* METRIC TABLE */
+.mtbl{width:100%;border-collapse:collapse;}
+.mtbl th{font-size:10px;font-family:var(--mono);color:var(--text3);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);letter-spacing:.06em;text-transform:uppercase;}
+.mtbl td{font-size:12px;padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text2);}
+.mtbl tr:last-child td{border-bottom:none;}
+.mtbl td:first-child{font-family:var(--mono);color:var(--teal);font-size:12px;}
+.mtbl td:last-child{font-family:var(--mono);color:var(--text3);font-size:11px;}
+
+/* TIMELINE */
+.timeline-bar{height:4px;background:var(--bg4);border-radius:2px;margin:8px 0 4px;overflow:hidden;}
+.timeline-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:2px;transition:width .5s;}
+
+/* GOAL CARD */
+.goal-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;border-left:3px solid transparent;}
+.goal-t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.goal-s{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;}
+.goal-out{font-size:11px;font-family:var(--mono);color:var(--text3);}
+
+/* REVIEW */
+.review-input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:7px 10px;color:var(--text);font-family:var(--font);font-size:13px;width:100%;}
+.review-input:focus{outline:none;border-color:var(--border2);}
+textarea.review-input{height:90px;resize:vertical;}
+
+/* TODAY BANNER */
+.today-banner{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.dtype-btn{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:var(--font);}
+.dtype-btn.thuis{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+.dtype-btn.rdam{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+
+/* TIME BLOCK */
+.tblock{display:grid;grid-template-columns:70px 1fr;border-bottom:1px solid var(--border);}
+.tblock:last-child{border-bottom:none;}
+.tb-t{padding:10px 10px 10px 0;font-size:11px;font-family:var(--mono);color:var(--text3);border-right:1px solid var(--border);}
+.tb-c{padding:10px 0 10px 14px;}
+.tb-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.tb-sub{font-size:12px;color:var(--text2);line-height:1.5;}
+.tag{display:inline-block;font-size:10px;font-family:var(--mono);padding:1px 7px;border-radius:3px;margin-right:4px;}
+.tg{background:var(--green-bg);color:var(--green);}
+.tb{background:var(--blue-bg);color:var(--blue);}
+.ta{background:var(--amber-bg);color:var(--amber);}
+.tp{background:var(--purple-bg);color:var(--purple);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .page{padding:16px;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">Life <span>OS</span></div>
+    <div class="sidebar-logo-sub" id="sb-date">laden...</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Vandaag</div>
+    <button class="nav-item active" onclick="goto('today')"><span class="nav-pip" style="background:var(--accent)"></span>Overzicht<span class="nav-badge" id="nb-today">0/7</span></button>
+    <button class="nav-item" onclick="goto('habits')"><span class="nav-pip" style="background:var(--green)"></span>Habits</button>
+    <button class="nav-item" onclick="goto('week')"><span class="nav-pip" style="background:var(--blue)"></span>Deze week</button>
+    <button class="nav-item" onclick="goto('maand')"><span class="nav-pip" style="background:var(--purple)"></span>Maand</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Sport</div>
+    <button class="nav-item" onclick="goto('plan')"><span class="nav-pip" style="background:var(--amber)"></span>Trainingsplan</button>
+    <button class="nav-item" onclick="goto('import')"><span class="nav-pip" style="background:var(--teal)"></span>Import / Export</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Doelen</div>
+    <button class="nav-item" onclick="goto('spaans')"><span class="nav-pip" style="background:var(--amber)"></span>Spaans</button>
+    <button class="nav-item" onclick="goto('investing')"><span class="nav-pip" style="background:var(--teal)"></span>Investeren</button>
+    <button class="nav-item" onclick="goto('reading')"><span class="nav-pip" style="background:var(--purple)"></span>Lezen</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Systeem</div>
+    <button class="nav-item" onclick="goto('dagstructuur')"><span class="nav-pip" style="background:var(--coral)"></span>Dagstructuur</button>
+    <button class="nav-item" onclick="goto('review')"><span class="nav-pip" style="background:var(--purple)"></span>Weekly review</button>
+    <button class="nav-item" onclick="goto('doelen')"><span class="nav-pip" style="background:var(--text3)"></span>Top 5 doelen</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- PAGE: TODAY -->
+<div id="page-today" class="page active">
+  <div class="today-banner">
+    <div>
+      <div style="font-size:22px;font-weight:700;letter-spacing:-.3px;" id="today-title">laden...</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:3px;" id="today-week">week —</div>
+    </div>
+    <button class="dtype-btn thuis" id="dtype-btn" onclick="toggleDtype()">Thuisdag</button>
+  </div>
+
+  <div class="g4">
+    <div class="stat" style="border-left:3px solid var(--accent)"><div class="stat-label">Habits vandaag</div><div class="stat-val" id="ts-habits" style="color:var(--accent)">0/7</div><div class="stat-sub">Klik voor details</div></div>
+    <div class="stat" style="border-left:3px solid var(--amber)"><div class="stat-label">Vakantie</div><div class="stat-val" id="ts-vak" style="color:var(--amber)">—</div><div class="stat-sub" id="ts-vak-sub">datum</div></div>
+    <div class="stat" style="border-left:3px solid var(--blue)"><div class="stat-label">Nieuwe baan</div><div class="stat-val" id="ts-baan" style="color:var(--blue)">—</div><div class="stat-sub" id="ts-baan-sub">datum</div></div>
+    <div class="stat" style="border-left:3px solid var(--green)"><div class="stat-label">Weken tot doel</div><div class="stat-val" id="ts-weken" style="color:var(--green)">—</div><div class="stat-sub" id="ts-doel-sub">top fit doel</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Focus vandaag</span></div>
+      <div class="habit-list" id="focus-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Week voortgang</span></div>
+      <div id="today-week-prog"></div>
+      <div class="timeline-bar" style="margin-top:14px"><div class="timeline-fill" id="tl-fill" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--text3);margin-top:4px;">
+        <span id="tl-start">start</span><span style="color:var(--amber)" id="tl-mid">midden</span><span id="tl-end">einde</span>
+      </div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--text3);text-align:center;margin-top:5px;" id="tl-pct">0%</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: HABITS -->
+<div id="page-habits" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Dag<span>elijkse habits</span></h2><div class="page-hd-sub" id="habits-date-sub">vandaag</div></div><span id="habit-badge" class="badge b-amber">0 / 7</span></div>
+
+  <div class="g2">
+    <div class="card fw">
+      <div class="card-title"><span><span class="ctd"></span>Habits afvinken</span></div>
+      <div class="habit-list" id="habit-list"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card">
+        <div class="card-title"><span><span class="ctd"></span>Training vandaag</span><span onclick="goto('plan')" style="cursor:pointer;color:var(--text3);font-size:10px;">bekijk schema →</span></div>
+        <div class="workout-grid" id="workout-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span><span class="ctd"></span>Metrics</span></div>
+        <div id="metrics-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: WEEK -->
+<div id="page-week" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Deze <span>week</span></h2><div class="page-hd-sub">habit tracking & streaks</div></div></div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Week overzicht</span></div>
+    <div class="week-strip" id="week-strip"></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Habit streaks</span></div>
+      <div class="streak-grid" id="streak-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Habits deze week</span></div>
+      <div class="chart-wrap"><canvas id="weekChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Week voortgang</span></div>
+    <div id="week-progress-bars"></div>
+  </div>
+</div>
+
+<!-- PAGE: MAAND -->
+<div id="page-maand" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2><span>Maand</span> overzicht</h2><div class="page-hd-sub" id="maand-sub">laden...</div></div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Habit heatmap</span><span id="heatmap-month-label"></span></div>
+      <div class="hmap-lbls"><div class="hmap-lbl">zo</div><div class="hmap-lbl">ma</div><div class="hmap-lbl">di</div><div class="hmap-lbl">wo</div><div class="hmap-lbl">do</div><div class="hmap-lbl">vr</div><div class="hmap-lbl">za</div></div>
+      <div class="hmap" id="heatmap-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Eiwit trend (30 dagen)</span></div>
+      <div class="chart-wrap"><canvas id="proteinChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Trainingen deze maand</span></div>
+    <div id="month-workout-summary"></div>
+  </div>
+</div>
+
+<!-- PAGE: PLAN -->
+<div id="page-plan" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Trainings<span>plan</span></h2><div class="page-hd-sub">Upper/Lower split + hardlopen</div></div></div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Weekschema</span></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;" id="plan-week-grid"></div>
+  </div>
+  <div id="plan-detail"></div>
+</div>
+
+<!-- PAGE: IMPORT -->
+<div id="page-import" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Import <span>/ Export</span></h2><div class="page-hd-sub">Garmin, Chronometer, backup</div></div></div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Import</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;letter-spacing:.05em;">GARMIN CONNECT — Activities CSV</div>
+        <div class="drop-zone"><input type="file" accept=".csv" onchange="handleGarminImport(event)"><div style="font-size:22px;margin-bottom:6px;">📊</div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Garmin CSV</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);">Activities export van Garmin Connect</div></div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;letter-spacing:.05em;">CHRONOMETER — Diary CSV</div>
+        <div class="drop-zone"><input type="file" accept=".csv" onchange="handleChronoImport(event)"><div style="font-size:22px;margin-bottom:6px;">🥗</div><div style="font-size:13px;font-weight:600;margin-bottom:3px;">Chronometer CSV</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);">Diary export van Cronometer.com</div></div>
+      </div>
+    </div>
+    <div class="import-log" id="import-log">Wachtend op import...</div>
+  </div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Export & Backup</span></div>
+    <div class="btn-row">
+      <button class="btn btn-acc" onclick="exportJSON()">💾 Data exporteren (JSON)</button>
+      <button class="btn" onclick="importJSON()">📂 Data importeren (JSON)</button>
+      <button class="btn" onclick="exportCSV()">📋 Exporteer als CSV</button>
+      <button class="btn" onclick="clearData()" style="color:var(--red);border-color:#3a1515;">🗑 Data wissen</button>
+    </div>
+    <input type="file" id="json-import-input" accept=".json" style="display:none" onchange="handleJSONImport(event)">
+    <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:var(--mono);line-height:1.8;">Data wordt automatisch opgeslagen in je browser (localStorage).<br>Maak regelmatig een JSON backup — zeker bij wisselen van browser of apparaat.</div>
+  </div>
+</div>
+
+<!-- PAGE: SPAANS -->
+<div id="page-spaans" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Spaans <span>leren</span></h2><div class="page-hd-sub">van duolingo naar echt spreken</div></div></div>
+  <div class="g4">
+    <div class="stat"><div class="stat-label">Sessies/week</div><div class="stat-val" style="color:var(--amber)">5–7x</div><div class="stat-sub">minimum 5x</div></div>
+    <div class="stat"><div class="stat-label">Duur</div><div class="stat-val" style="color:var(--amber)">20–30</div><div class="stat-sub">minuten</div></div>
+    <div class="stat"><div class="stat-label">Methode</div><div class="stat-val" style="font-size:14px;color:var(--amber)">Claude</div><div class="stat-sub">typen in het Spaans</div></div>
+    <div class="stat"><div class="stat-label">Niveau doel</div><div class="stat-val" style="font-size:14px;color:var(--amber)">A2→B1</div><div class="stat-sub">actief leren</div></div>
+  </div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Dagelijkse structuur</span></div>
+    <div class="tblock"><div class="tb-t">Ochtend</div><div class="tb-c"><div class="tb-title">10 min Duolingo</div><div class="tb-sub">Opwarmer. Woordenschat herhaling.</div></div></div>
+    <div class="tblock"><div class="tb-t">Na lunch</div><div class="tb-c"><div class="tb-title">20–30 min gesprek met Claude</div><div class="tb-sub">Vast thema per week. Dit is waar het echte leren gebeurt. Fouten worden gecorrigeerd.</div></div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Aanvullend</span></div>
+      <div class="rule-item"><div class="rule-n" style="background:var(--amber-bg);color:var(--amber)">1</div><div><div class="rule-t">Pimsleur (optioneel)</div><div class="rule-s">Audio voor uitspraak oefenen. 30 min/dag in de auto of onderweg.</div></div></div>
+      <div class="rule-item"><div class="rule-n" style="background:var(--amber-bg);color:var(--amber)">2</div><div><div class="rule-t">iTalki</div><div class="rule-s">Native speaker voor conversatie. €15–20/uur.</div></div></div>
+      <div class="rule-item"><div class="rule-n" style="background:var(--amber-bg);color:var(--amber)">3</div><div><div class="rule-t">Trein = Spaans kans</div><div class="rule-s">Rotterdam dag? Typ een gesprek met Claude in de trein terug.</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Sessies bijhouden</span></div>
+      <div class="streak-grid" id="spaans-streak"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: INVESTEREN -->
+<div id="page-investing" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Investeren <span>& analyse</span></h2><div class="page-hd-sub">fundament versterken, bedrijven leren doorgronden</div></div></div>
+  <div class="g4">
+    <div class="stat"><div class="stat-label">Sessies/week</div><div class="stat-val" style="color:var(--teal)">2–4x</div><div class="stat-sub">minimum 2x</div></div>
+    <div class="stat"><div class="stat-label">Niveau</div><div class="stat-val" style="font-size:14px;color:var(--teal)">Gevorderd</div><div class="stat-sub">Graham, Buffett ✓</div></div>
+    <div class="stat"><div class="stat-label">Focus nu</div><div class="stat-val" style="font-size:14px;color:var(--teal)">Analyse</div><div class="stat-sub">bedrijven doorgronden</div></div>
+    <div class="stat"><div class="stat-label">Actie</div><div class="stat-val" style="font-size:14px;color:var(--blue)">Auto</div><div class="stat-sub">maandelijkse inleg</div></div>
+  </div>
+
+  <div class="tabs" id="inv-tabs">
+    <div class="tab active" onclick="swTab(this,'inv-metrics','inv-tabs')">Key metrics</div>
+    <div class="tab" onclick="swTab(this,'inv-bronnen','inv-tabs')">Bronnen</div>
+  </div>
+
+  <div class="tc active" id="inv-metrics">
+    <div class="card fw">
+      <div class="card-title"><span><span class="ctd"></span>Kwaliteit van het bedrijf</span></div>
+      <table class="mtbl">
+        <thead><tr><th>Metric</th><th>Wat het meet</th><th>Drempel</th></tr></thead>
+        <tbody>
+          <tr><td>ROIC</td><td>Rendement op geïnvesteerd kapitaal. Beste maatstaf voor moat.</td><td>&gt;15% over 10j</td></tr>
+          <tr><td>Gross margin</td><td>Brutomarge — hoog en stabiel = prijsmacht.</td><td>stabiel/stijgend</td></tr>
+          <tr><td>FCF margin</td><td>Free cash flow marge. Eerlijkste winstmaatstaf.</td><td>&gt;15% voorkeur</td></tr>
+        </tbody>
+      </table>
+      <div class="card-title" style="margin-top:16px"><span><span class="ctd"></span>Waardering</span></div>
+      <table class="mtbl">
+        <thead><tr><th>Metric</th><th>Wat het meet</th><th>Drempel</th></tr></thead>
+        <tbody>
+          <tr><td>P/FCF</td><td>Prijs/Free Cash Flow. Betrouwbaarder dan P/E.</td><td>&lt;20x interessant</td></tr>
+          <tr><td>EV/EBITDA</td><td>Sectorvergelijking onafhankelijk van schuld en belasting.</td><td>vs sector mediaan</td></tr>
+          <tr><td>Margin of safety</td><td>Koop significant onder intrinsieke waarde.</td><td>≥30% korting</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tc" id="inv-bronnen">
+    <div class="g2">
+      <div class="card">
+        <div class="card-title"><span><span class="ctd"></span>Boeken</span></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">The Outsiders — Thorndike</div><div class="rule-s">8 CEO's die uitzonderlijk kapitaal alloceerden.</div></div></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Poor Charlie's Almanack — Munger</div><div class="rule-s">Mental models, thinking frameworks.</div></div></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Financial Statements — Ittelson</div><div class="rule-s">Beste boek om jaarverslagen te lezen.</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span><span class="ctd"></span>Podcasts & tools</span></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Acquired podcast</div><div class="rule-s">Diepgaande business histories.</div></div></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Founders — David Senra</div><div class="rule-s">Biografie per aflevering. Patroonherkenning.</div></div></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Macrotrends / Tikr / Stockanalysis</div><div class="rule-s">Gratis tools voor historische metrics.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: LEZEN -->
+<div id="page-reading" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2><span>Lezen</span></h2><div class="page-hd-sub">min 10 pagina's per dag — trein of voor bed</div></div></div>
+  <div class="g4">
+    <div class="stat"><div class="stat-label">Doel/dag</div><div class="stat-val" style="color:var(--purple)">10+</div><div class="stat-sub">pagina's</div></div>
+    <div class="stat"><div class="stat-label">Ankers</div><div class="stat-val" style="font-size:14px;color:var(--purple)">Trein/bed</div><div class="stat-sub">vast moment</div></div>
+    <div class="stat"><div class="stat-label">Minimum/week</div><div class="stat-val" style="color:var(--purple)">5x</div><div class="stat-sub">zelfs 10 min telt</div></div>
+    <div class="stat"><div class="stat-label">Trein return</div><div class="stat-val" style="color:var(--purple)">~90m</div><div class="stat-sub">Rotterdam dag</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Ankers</span></div>
+      <div class="rule-item"><div class="rule-n" style="background:var(--purple-bg);color:var(--purple)">1</div><div><div class="rule-t">Trein heen & terug</div><div class="rule-s">Telefoon op vliegtuigstand. Boek of Kindle mee.</div></div></div>
+      <div class="rule-item"><div class="rule-n" style="background:var(--purple-bg);color:var(--purple)">2</div><div><div class="rule-t">Laatste 20 min voor slaap</div><div class="rule-s">Boek naast bed, niet telefoon.</div></div></div>
+      <div class="rule-item"><div class="rule-n" style="background:var(--purple-bg);color:var(--purple)">3</div><div><div class="rule-t">Na ochtendtraining — ontbijt</div><div class="rule-s">15 min lezen tijdens ontbijt.</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Leeslijst</span></div>
+      <div id="book-list">
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">The Outsiders — Thorndike</div><div class="rule-s">Investeren. Nu starten.</div></div></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Poor Charlie's Almanack — Munger</div><div class="rule-s">Investeren/mindset.</div></div></div>
+        <div class="rule-item" style="padding:10px 0"><div><div class="rule-t">Financial Statements — Ittelson</div><div class="rule-s">Technisch. Referentieboek.</div></div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <input id="new-book" placeholder="Voeg boek toe..." class="review-input" style="flex:1" onkeydown="if(event.key==='Enter')addBook()">
+        <button class="btn" onclick="addBook()">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: DAGSTRUCTUUR -->
+<div id="page-dagstructuur" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Dag<span>structuur</span></h2><div class="page-hd-sub">systemen die werken op je slechtste dag</div></div></div>
+
+  <div class="tabs" id="dag-tabs">
+    <div class="tab active" onclick="swTab(this,'dag-thuis','dag-tabs')">Thuisdag</div>
+    <div class="tab" onclick="swTab(this,'dag-rdam','dag-tabs')">Rotterdam dag</div>
+    <div class="tab" onclick="swTab(this,'dag-regels','dag-tabs')">Systeemregels</div>
+  </div>
+
+  <div class="tc active" id="dag-thuis">
+    <div class="card fw">
+      <div class="tblock"><div class="tb-t">06:30</div><div class="tb-c"><div class="tb-title">Opstaan — geen telefoon</div><div class="tb-sub">Direct uit bed. 5 min buiten of raam open.</div></div></div>
+      <div class="tblock"><div class="tb-t">06:35</div><div class="tb-c"><div class="tb-title"><span class="tag tg">sport</span> Training — 45 min</div><div class="tb-sub">Vóór werk = gedaan, wat er ook later gebeurt.</div></div></div>
+      <div class="tblock"><div class="tb-t">07:45</div><div class="tb-c"><div class="tb-title">Douchen + ontbijt + 15 min lezen</div><div class="tb-sub">Geen socials. Boek of Acquired podcast.</div></div></div>
+      <div class="tblock"><div class="tb-t">08:30</div><div class="tb-c"><div class="tb-title"><span class="tag tb">werk</span> Deep work blok 1 — 90 min</div><div class="tb-sub">Telefoon stil, notificaties uit. Meest cognitief zware taak van de dag.</div></div></div>
+      <div class="tblock"><div class="tb-t">10:00</div><div class="tb-c"><div class="tb-title">Pauze — 10 min lopen</div><div class="tb-sub">Geen scherm. Reset voor blok 2.</div></div></div>
+      <div class="tblock"><div class="tb-t">10:15</div><div class="tb-c"><div class="tb-title"><span class="tag tb">werk</span> Deep work blok 2</div><div class="tb-sub">Tweede zware taak. Nog geen email of Slack.</div></div></div>
+      <div class="tblock"><div class="tb-t">12:00</div><div class="tb-c"><div class="tb-title">Lunch + email/berichten</div><div class="tb-sub">Eerste keer reactief vandaag.</div></div></div>
+      <div class="tblock"><div class="tb-t">13:00</div><div class="tb-c"><div class="tb-title"><span class="tag ta">leren</span> Leerblok — 45 min</div><div class="tb-sub">Spaans (20–30 min) óf financiële analyse. Heilig blok.</div></div></div>
+      <div class="tblock"><div class="tb-t">13:45</div><div class="tb-c"><div class="tb-title"><span class="tag tb">werk</span> Lichte taken</div><div class="tb-sub">Calls, admin, email follow-up.</div></div></div>
+      <div class="tblock"><div class="tb-t">17:00</div><div class="tb-c"><div class="tb-title">Harde stop — laptop dicht</div><div class="tb-sub">Schrijf eerste taak morgen op.</div></div></div>
+      <div class="tblock"><div class="tb-t">Avond</div><div class="tb-c"><div class="tb-title"><span class="tag tp">lezen</span> 10+ pagina's</div><div class="tb-sub">Voor bed. Geen werk, geen scherm.</div></div></div>
+      <div class="tblock"><div class="tb-t">21:30</div><div class="tb-c"><div class="tb-title">Wind-down</div><div class="tb-sub">Lezen, wandelen, Nico. Slaap 22:30–23:00 voor 7+ uur.</div></div></div>
+    </div>
+  </div>
+
+  <div class="tc" id="dag-rdam">
+    <div class="card fw">
+      <div class="tblock"><div class="tb-t">06:15</div><div class="tb-c"><div class="tb-title"><span class="tag tg">sport</span> Training — 30–40 min</div><div class="tb-sub">Desnoods bodyweight. Geen excuus voor vroege trein.</div></div></div>
+      <div class="tblock"><div class="tb-t">07:15</div><div class="tb-c"><div class="tb-title">Klaar + ontbijt</div><div class="tb-sub">Podcast geladen, boek mee.</div></div></div>
+      <div class="tblock"><div class="tb-t">Trein →</div><div class="tb-c"><div class="tb-title"><span class="tag ta">leren</span> Podcast of boek</div><div class="tb-sub">Acquired, Founders, of leesblok. Geen socials.</div></div></div>
+      <div class="tblock"><div class="tb-t">Kantoor</div><div class="tb-c"><div class="tb-title"><span class="tag tb">werk</span> Focus + meetings</div><div class="tb-sub">Plan vóór vertrek welke 1–2 dingen je afmaakt.</div></div></div>
+      <div class="tblock"><div class="tb-t">Trein ←</div><div class="tb-c"><div class="tb-title"><span class="tag ta">leren</span> Spaans of reflectie</div><div class="tb-sub">Spaans typen op telefoon.</div></div></div>
+      <div class="tblock"><div class="tb-t">Avond</div><div class="tb-c"><div class="tb-title">Rust — lezen voor bed</div><div class="tb-sub">Rotterdam kost meer energie. Avond = opladen.</div></div></div>
+    </div>
+    <div style="background:var(--amber-bg);border:1px solid #3a2a0a;border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--amber);margin-top:10px;">
+      Rotterdam-dagen = halve productiedagen. Plan geen zware deliverables op die dagen.
+    </div>
+  </div>
+
+  <div class="tc" id="dag-regels">
+    <div class="card fw">
+      <div class="rule-item"><div class="rule-n">1</div><div><div class="rule-t">Train vóór werk, altijd</div><div class="rule-s">Als training na werk staat, verdwijnt het zodra de dag uitloopt.</div></div></div>
+      <div class="rule-item"><div class="rule-n">2</div><div><div class="rule-t">Eerst taak, dan telefoon</div><div class="rule-s">Schrijf eerste taak op vóórdat je telefoon checkt.</div></div></div>
+      <div class="rule-item"><div class="rule-n">3</div><div><div class="rule-t">Leerblok is heilig</div><div class="rule-s">Niet "als ik tijd heb". Staat vast.</div></div></div>
+      <div class="rule-item"><div class="rule-n">4</div><div><div class="rule-t">Harde stop om 17:00</div><div class="rule-s">Geen "nog even". Onafgemaakt werk staat morgen als eerste taak.</div></div></div>
+      <div class="rule-item"><div class="rule-n">5</div><div><div class="rule-t">Miste dag = reset, niet inhalen</div><div class="rule-s">Dubbel doen leidt tot uitputting.</div></div></div>
+    </div>
+    <div class="g2" style="margin-top:0">
+      <div class="card">
+        <div class="card-title"><span><span class="ctd"></span>Habit stacking</span></div>
+        <div class="rule-item"><div><div class="rule-t">Na koffie zetten</div><div class="rule-s">→ Duolingo (5 min)</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Na training</div><div class="rule-s">→ Douche + boek bij ontbijt</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Na lunch</div><div class="rule-s">→ Spaans met Claude</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Na laptop dicht</div><div class="rule-s">→ Wandeling of Nico</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span><span class="ctd"></span>Wrijving verlagen</span></div>
+        <div class="rule-item"><div><div class="rule-t">Sportkleren klaarleggen</div><div class="rule-s">Avond ervoor. Geen zoeken 's ochtends.</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Boek naast bed</div><div class="rule-s">Niet telefoon. Fysiek bereikbaar.</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Podcast app als startscherm</div><div class="rule-s">Acquired direct beschikbaar op telefoon.</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Laptop op bureau</div><div class="rule-s">Niet op de bank. Signaleer werkmodus.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: REVIEW -->
+<div id="page-review" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Weekly <span>review</span></h2><div class="page-hd-sub">elke zondag, 20 minuten — niet optioneel</div></div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Terugkijken</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:5px;">SPORT (keer):</div><input type="number" min="0" max="7" placeholder="0–7" id="rv-sport" class="review-input" style="width:80px"></div>
+        <div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:5px;">SPAANS (sessies):</div><input type="number" min="0" max="7" placeholder="0–7" id="rv-spaans" class="review-input" style="width:80px"></div>
+        <div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:5px;">INVESTEREN/LEREN (sessies):</div><input type="number" min="0" max="7" placeholder="0–7" id="rv-invest" class="review-input" style="width:80px"></div>
+        <div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:5px;">LEESDAGEN:</div><input type="number" min="0" max="7" placeholder="0–7" id="rv-lezen" class="review-input" style="width:80px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span><span class="ctd"></span>Wat blokkeerde me?</span></div>
+      <textarea id="rv-blok" class="review-input" placeholder="Eerlijk zijn. Te laat opgestaan? Te druk? Systeem niet realistisch?"></textarea>
+    </div>
+  </div>
+  <div class="card fw">
+    <div class="card-title"><span><span class="ctd"></span>Top 3 prioriteiten volgende week</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-family:var(--mono);color:var(--text3);min-width:80px;">WERK</span><input type="text" id="rv-p1" class="review-input" placeholder="Wat is de #1 werkprioriteit?"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-family:var(--mono);color:var(--text3);min-width:80px;">LICHAAM</span><input type="text" id="rv-p2" class="review-input" placeholder="Trainingsplan of aanpassing?"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-family:var(--mono);color:var(--text3);min-width:80px;">LEREN</span><input type="text" id="rv-p3" class="review-input" placeholder="Spaans thema of investeringsonderwerp?"></div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;margin-top:4px;">
+    <button class="btn btn-acc" onclick="saveReview()">Review opslaan</button>
+    <span id="rv-saved" style="font-size:12px;color:var(--green);font-family:var(--mono);display:none;">✓ opgeslagen</span>
+  </div>
+</div>
+
+<!-- PAGE: DOELEN -->
+<div id="page-doelen" class="page">
+  <div class="page-hd"><div class="page-hd-left"><h2>Top 5 <span>doelen</span></h2><div class="page-hd-sub">Buffett 25/5 methode</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:10px;" class="fw">
+    <div class="goal-card" style="border-left-color:var(--green)"><div class="goal-t">Gezond zijn en voelen</div><div class="goal-s">4–5x per week trainen vóór 08:00. 7+ uur slapen. Goed eten. Routine vastleggen als systeem.</div><div class="goal-out">Aantoonbaar fitter. Trainingsroutine zit vast.</div></div>
+    <div class="goal-card" style="border-left-color:var(--amber)"><div class="goal-t">Spaans leren</div><div class="goal-s">Dagelijks 20–30 min gesprekken. Per week nieuw thema. In Spanje echt gebruiken.</div><div class="goal-out">Basisgesprekken voeren zonder Google Translate.</div></div>
+    <div class="goal-card" style="border-left-color:var(--teal)"><div class="goal-t">Investeren & vermogen opbouwen</div><div class="goal-s">Financiële literacy verdiepen. Bedrijven leren analyseren. Eigen checklist bouwen. Automatisch inleggen.</div><div class="goal-out">Eigen analysechecklist klaar, eerste bedrijf volledig doorgeanalyseerd.</div></div>
+    <div class="goal-card" style="border-left-color:var(--coral)"><div class="goal-t">Goede relatie met Nico</div><div class="goal-s">Leuke dates, vakanties, bewuste kwaliteitstijd. Niet laten wegglippen door drukte.</div><div class="goal-out">Vakantie samen geweest, meerdere bewuste momenten gehad.</div></div>
+    <div class="goal-card" style="border-left-color:var(--blue)"><div class="goal-t">Familie min 1x per maand</div><div class="goal-s">Bewust inplannen. Niet laten versloffen door drukte.</div><div class="goal-out">Elke maand minimaal 1 moment met familie.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span><span class="ctd"></span>De overige 20 — bewust genegeerd</span></div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">Dit zijn de doelen die je hebt opgeschreven maar bewust niet gekozen. Ze zijn niet "ook belangrijk" — het zijn actieve afleidingen zolang de top 5 niet zit.</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+const HABITS = [
+  { id:'water',       name:'Water drinken',      target:'2–3 liter' },
+  { id:'protein',     name:'Eiwit gehaald',       target:'160 g' },
+  { id:'snack',       name:'Goede snack gehad',   target:'fruit/eiwitbar' },
+  { id:'no_late_eat', name:'Niet laat gegeten',   target:'–2u voor slaap' },
+  { id:'steps',       name:'Stappen gehaald',     target:'10.000+' },
+  { id:'hevy',        name:'Hevy gelogd',         target:'na gym' },
+  { id:'sleep',       name:'8 uur geslapen',      target:'8 uur' },
+];
+
+const WORKOUTS = [
+  { id:'upper_a', label:'Upper A', cls:'au' },
+  { id:'upper_b', label:'Upper B', cls:'au' },
+  { id:'lower_a', label:'Lower A', cls:'al' },
+  { id:'lower_b', label:'Lower B', cls:'al' },
+  { id:'run1',    label:'Run 1',   cls:'ar' },
+  { id:'run2',    label:'Run 2',   cls:'ar' },
+  { id:'bike',    label:'Fiets / Kiten', cls:'ab' },
+  { id:'rest',    label:'Rust',    cls:'ax' },
+];
+
+const W_COLOR = { upper_a:'#5b9cf6',upper_b:'#5b9cf6',lower_a:'#4ade80',lower_b:'#4ade80',run1:'#fbbf24',run2:'#fbbf24',bike:'#a78bfa',rest:'#5a5f6b' };
+const W_BG    = { upper_a:'#1a2535',upper_b:'#1a2535',lower_a:'#0d2318',lower_b:'#0d2318',run1:'#231a07',run2:'#231a07',bike:'#1a1530',rest:'#26292f' };
+
+const METRICS_DEF = [
+  { id:'protein_g', label:'Eiwit',        unit:'g',    max:250,  goal:160,  group:'body' },
+  { id:'water_l',   label:'Water',        unit:'L',    max:4,    goal:2.5,  group:'body' },
+  { id:'sleep_h',   label:'Slaap',        unit:'u',    max:12,   goal:8,    group:'body' },
+  { id:'steps',     label:'Stappen',      unit:'k',    max:20,   goal:10,   group:'body' },
+  { id:'kcal',      label:'Calorieën',    unit:'kcal', max:5000, goal:2800, group:'macro' },
+  { id:'carbs_g',   label:'Koolhydraten', unit:'g',    max:500,  goal:300,  group:'macro' },
+  { id:'fat_g',     label:'Vetten',       unit:'g',    max:200,  goal:80,   group:'macro' },
+  { id:'fiber_g',   label:'Vezels',       unit:'g',    max:60,   goal:30,   group:'macro' },
+];
+
+const DAYS_NL = ['zo','ma','di','wo','do','vr','za'];
+const MONTHS_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+
+const WEEK_PLAN = [
+  { day:'Ma', session:'upper_a', label:'Upper A',            color:'blue' },
+  { day:'Di', session:'lower_a', label:'Lower A',            color:'green' },
+  { day:'Wo', session:'run1',    label:'Run 1',              color:'amber' },
+  { day:'Do', session:'upper_b', label:'Upper B',            color:'blue' },
+  { day:'Vr', session:'lower_b', label:'Lower B',            color:'green' },
+  { day:'Za', session:'bike',    label:'Rust / Kiten / Ride',color:'purple' },
+  { day:'Zo', session:'run2',    label:'Run 2 / Rust',       color:'amber' },
+];
+
+const PLAN_SESSIONS = {
+  upper_a: {
+    title:'Upper A — druk + trek (kracht)', color:'blue',
+    note:'Zwaarste upper dag. Compound-first, focus op progressie in gewicht. Log alles in Hevy direct na afloop.',
+    exercises:[
+      { name:'Barbell bench press',  sets:'4 × 5–6',   note:'Volle ROM, gecontroleerd omlaag' },
+      { name:'Pendlay row',          sets:'4 × 5–6',   note:'Borst parallel aan grond' },
+      { name:'Overhead press (DB)',  sets:'3 × 8–10',  note:'Strikte vorm, geen momentum' },
+      { name:'Cable lat pulldown',   sets:'3 × 10–12', note:'Schouderbladen samentrekken' },
+      { name:'Incline DB curl',      sets:'3 × 12',    note:'Volledige stretch onderaan' },
+      { name:'Triceps pushdown',     sets:'3 × 12',    note:'Ellebogen gefixeerd' },
+    ]
+  },
+  upper_b: {
+    title:'Upper B — volume', color:'blue',
+    note:'Volume dag — hogere reps, meer sets per spiergroep. Iets minder gewicht dan Upper A, meer totale stimulus.',
+    exercises:[
+      { name:'Incline DB press',       sets:'4 × 8–10',  note:'30° bank, schouderbladen ingetrokken' },
+      { name:'Cable row (seated)',     sets:'4 × 10–12', note:'Ellebogen langs het lichaam' },
+      { name:'DB lateral raise',      sets:'3 × 15',    note:'Lichte gewichten, controlled' },
+      { name:'Pull-up / lat machine', sets:'3 × 8–10',  note:'Volle ROM, langzaam omlaag' },
+      { name:'Face pull',             sets:'3 × 15',    note:'Hoog attachment, naar gezicht' },
+      { name:'EZ-bar curl',           sets:'3 × 12',    note:'' },
+      { name:'Dips',                  sets:'3 × 12',    note:'Licht voorover voor borst' },
+    ]
+  },
+  lower_a: {
+    title:'Lower A — squat-focus (kracht)', color:'green',
+    note:'Kracht dag. Back squat is het fundament — zorg voor goede opwarming (2 opwarmseries). Nordic curls zijn verplicht voor kniebescherming bij het hardlopen.',
+    exercises:[
+      { name:'Back squat',         sets:'4 × 5–6',   note:'Hips below parallel, chest up' },
+      { name:'Romanian deadlift',  sets:'3 × 8–10',  note:'Hamstring stretch, lichte kniebuiging' },
+      { name:'Leg press',          sets:'3 × 10–12', note:'Voeten schouderbreedte' },
+      { name:'Leg curl (machine)', sets:'3 × 12',    note:'Gecontroleerd terug' },
+      { name:'Nordic curl',        sets:'3 × 6–8',   note:'⚠️ Verplicht — kniebescherming hardlopen' },
+      { name:'Calf raise',         sets:'4 × 15',    note:'Volledige ROM, pauze bovenaan' },
+    ]
+  },
+  lower_b: {
+    title:'Lower B — deadlift-focus (hypertrofie)', color:'green',
+    note:'Deadlift is de anchor. Bulgarian split squat is zwaar op de quads — doe ze voor leg extension, niet erna.',
+    exercises:[
+      { name:'Deadlift (conventional)',   sets:'4 × 5',      note:'Heupen laag, borst omhoog, neutrale rug' },
+      { name:'Bulgarian split squat',    sets:'3 × 10 p/b', note:'Achterbeen op bank, lang stride' },
+      { name:'Leg extension',            sets:'3 × 15',     note:'Licht gewicht, squeeze bovenaan' },
+      { name:'Glute bridge / hip thrust',sets:'3 × 12',     note:'Barbell of body weight' },
+      { name:'Nordic curl',              sets:'3 × 6–8',    note:'⚠️ Verplicht — kniebescherming hardlopen' },
+      { name:'Tibialis raise',           sets:'3 × 20',     note:'Hielen op verhoging, teen omhoog' },
+    ]
+  },
+  run1: {
+    title:'Run 1 — zone 2 duurloop', color:'amber', isRun:true,
+    note:'Aerobe basis opbouwen. Rustig tempo — je moet comfortabel kunnen praten. Bouw elke week 10% op in tijd/afstand.',
+    runBlocks:[
+      { icon:'⏱', label:'Duur',    value:'40–50 min' },
+      { icon:'🏃', label:'Tempo',   value:'5:30–6:00 /km' },
+      { icon:'❤️', label:'Zone',    value:'Zone 2 (60–70% HRmax)' },
+      { icon:'📏', label:'Afstand', value:'~7–9 km' },
+      { icon:'📈', label:'Opbouw',  value:'+10% per week' },
+      { icon:'🎯', label:'Doel',    value:'Aerobe basis, vetverbranding, herstel' },
+    ]
+  },
+  run2: {
+    title:'Run 2 — tempo / intervallen (of fiets)', color:'amber', isRun:true,
+    note:'Kies op basis van hoe je je voelt: goed → intervallen; matig → tempoduur; moe → vervang door langere fietsrit (zone 2).',
+    runBlocks:[
+      { icon:'⏱', label:'Duur',               value:'35–45 min' },
+      { icon:'🏃', label:'Interval tempo',     value:'4:20–4:45 /km' },
+      { icon:'🏃', label:'Tempo run',          value:'4:45–5:10 /km' },
+      { icon:'🚴', label:'Fiets optie',        value:'60–90 min zone 2' },
+      { icon:'🔁', label:'Interval structuur', value:'6–8 × 3 min hard / 90s rust' },
+      { icon:'🎯', label:'Doel',               value:'Snelheid, lactaatdrempel' },
+    ]
+  },
+  bike: {
+    title:'Fiets — vervanging of extra', color:'purple', isRun:true,
+    note:'Kan Run 2 vervangen op zaterdag, of als extra sessie tussendoor. Zone 2 voor herstel en aerobe base.',
+    runBlocks:[
+      { icon:'⏱', label:'Duur',  value:'60–120 min' },
+      { icon:'💨', label:'Tempo', value:'28–32 km/h gemiddeld' },
+      { icon:'❤️', label:'Zone',  value:'Zone 2 (60–70% HRmax)' },
+      { icon:'🎯', label:'Doel',  value:'Aerobe basis, actief herstel' },
+    ]
+  },
+  rest: {
+    title:'Rust & herstel', color:'gray', isRest:true,
+    note:'Actief herstel. Sauna werkt goed op rustdag. 10.000 stappen richtlijn geldt ook hier.',
+    restItems:[
+      '🧖 Sauna (optioneel, 15–20 min)',
+      '🧘 Ochtendstretch 10 min (rugklachten preventie)',
+      '🚶 Lichte wandeling — stappendoel halen',
+      '😴 8 uur slaap prioriteit',
+      '🍽️ Voeding op orde — eiwitdoel ook op rustdag',
+    ]
+  }
+};
+
+let data = {};
+let selectedDate = todayKey();
+let selectedPlanSession = 'upper_a';
+let charts = {};
+
+// Countdown targets — stored in localStorage so user can update
+function getTargets() {
+  const defaults = { vakantie:'2025-07-24', vakantieLabel:'vakantie', baan:'2025-09-01', baanLabel:'nieuwe baan', doel:'2025-08-15', doelLabel:'top fit doel' };
+  const saved = localStorage.getItem('life_targets');
+  return saved ? Object.assign(defaults, JSON.parse(saved)) : defaults;
+}
+
+function todayKey() { return new Date().toISOString().split('T')[0]; }
+function dateKey(d) { return d.toISOString().split('T')[0]; }
+
+function loadData() {
+  const raw = localStorage.getItem('fitdash_v2');
+  if (raw) { try { data = JSON.parse(raw); } catch(e) { data = {}; } }
+  if (!data.days) data.days = {};
+}
+function saveData() { localStorage.setItem('fitdash_v2', JSON.stringify(data)); }
+
+function getDay(key) {
+  if (!data.days[key]) data.days[key] = { habits:{}, workout:null, metrics:{ protein_g:0,water_l:0,sleep_h:0,steps:0,kcal:0,carbs_g:0,fat_g:0,fiber_g:0 } };
+  if (!data.days[key].metrics) data.days[key].metrics = {};
+  return data.days[key];
+}
+
+// ═══════════════════════ NAVIGATION ═══════════════════════
+function goto(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if ((n.getAttribute('onclick')||'').includes("'"+id+"'")) n.classList.add('active');
+  });
+  if (id==='habits') { renderHabits(); renderWorkouts(); renderMetrics(); }
+  if (id==='week')   { renderWeekStrip(); renderStreaks(); renderWeekChart(); renderWeekProgress(); }
+  if (id==='maand')  { renderHeatmap(); renderProteinChart(); renderMonthSummary(); }
+  if (id==='plan')   renderPlan();
+}
+
+function swTab(btn, tcId, tabsId) {
+  document.getElementById(tabsId).querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.page').querySelectorAll('.tc').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tcId).classList.add('active');
+}
+
+// ═══════════════════════ TODAY ═══════════════════════
+function renderToday() {
+  const now = new Date();
+  const dagNamen = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+  document.getElementById('today-title').textContent = dagNamen[now.getDay()]+' '+now.getDate()+' '+MONTHS_NL[now.getMonth()];
+
+  const t = getTargets();
+  const doel = new Date(t.doel);
+  const vak  = new Date(t.vakantie);
+  const baan = new Date(t.baan);
+
+  // find earliest future date as "start" for timeline
+  const allDates = [vak, baan, doel].filter(d=>d>now).sort((a,b)=>a-b);
+  const timelineEnd = allDates[allDates.length-1] || doel;
+  const timelineStart = new Date(now); timelineStart.setDate(now.getDate()-30);
+  const pct = Math.min(100,Math.max(0,Math.round((now-timelineStart)/(timelineEnd-timelineStart)*100)));
+
+  document.getElementById('tl-fill').style.width = pct+'%';
+  document.getElementById('tl-pct').textContent = pct+'% voortgang';
+
+  const daysEl = d => { const n=Math.round((d-now)/86400000); return n<=0?'Gestart!':n+'d'; };
+  document.getElementById('ts-vak').textContent  = daysEl(vak);
+  document.getElementById('ts-vak-sub').textContent = t.vakantieLabel;
+  document.getElementById('ts-baan').textContent = daysEl(baan);
+  document.getElementById('ts-baan-sub').textContent = t.baanLabel;
+  document.getElementById('ts-weken').textContent = Math.max(0,Math.ceil((doel-now)/604800000))+'w';
+  document.getElementById('ts-doel-sub').textContent = t.doelLabel;
+
+  document.getElementById('sb-date').textContent = now.getDate()+' '+MONTHS_NL[now.getMonth()]+' · week '+getWeekNum(now);
+  document.getElementById('today-week').textContent = 'week '+getWeekNum(now)+' · '+MONTHS_NL[now.getMonth()]+' '+now.getFullYear();
+
+  const dt = localStorage.getItem('dtype-'+todayKey())||'thuis';
+  const btn = document.getElementById('dtype-btn');
+  btn.className = 'dtype-btn '+dt;
+  btn.textContent = dt==='thuis'?'Thuisdag':'Rotterdam dag';
+
+  renderFocusList();
+  renderTodayWeekProgress();
+  updateTodayScore();
+}
+
+function renderFocusList() {
+  const today = todayKey();
+  const day = getDay(today);
+  const list = document.getElementById('focus-list');
+  list.innerHTML = '';
+  const items = [
+    { id:'train',    label:'Training gedaan',       color:'var(--green)' },
+    { id:'spaans',   label:'Spaans geoefend',        color:'var(--amber)' },
+    { id:'leer',     label:'Leerblok gedaan',         color:'var(--teal)' },
+    { id:'lezen_d',  label:"10+ pagina's gelezen",   color:'var(--purple)' },
+    { id:'deepwork', label:'Deep work gedaan',        color:'var(--blue)' },
+    { id:'sleep',    label:'22:30 schermen weg',      color:'var(--coral)' },
+  ];
+  items.forEach(it => {
+    const done = !!day.habits[it.id];
+    const row = document.createElement('div');
+    row.className = 'habit-row'+(done?' done':'');
+    row.innerHTML = `<div class="habit-check">${done?'✓':''}</div><div class="habit-name">${it.label}</div><div style="width:8px;height:8px;border-radius:50%;background:${it.color};flex-shrink:0;"></div>`;
+    row.onclick = () => { day.habits[it.id]=!day.habits[it.id]; saveData(); renderFocusList(); updateTodayScore(); renderTodayWeekProgress(); };
+    list.appendChild(row);
+  });
+}
+
+function renderTodayWeekProgress() {
+  const dates = getWeekDates();
+  const counts = {train:0,spaans:0,leer:0,lezen_d:0};
+  const mins   = {train:3,spaans:5,leer:2,lezen_d:5};
+  const colors = {train:'var(--green)',spaans:'var(--amber)',leer:'var(--teal)',lezen_d:'var(--purple)'};
+  const labels = {train:'Sport',spaans:'Spaans',leer:'Leren',lezen_d:'Lezen'};
+  dates.forEach(d => {
+    const h = (data.days[d]||{}).habits||{};
+    Object.keys(counts).forEach(k => { if(h[k]) counts[k]++; });
+  });
+  const el = document.getElementById('today-week-prog');
+  el.innerHTML = '';
+  Object.keys(counts).forEach(k => {
+    const pct = Math.min(100,Math.round(counts[k]/mins[k]*100));
+    el.innerHTML += `<div class="prog-row"><div class="prog-lbl">${labels[k]} (${mins[k]}x min)</div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${colors[k]}"></div></div><div class="prog-pct">${counts[k]}/${mins[k]}</div></div>`;
+  });
+}
+
+function updateTodayScore() {
+  const day = getDay(todayKey());
+  const done = HABITS.filter(h=>day.habits[h.id]).length;
+  document.getElementById('ts-habits').textContent = done+'/7';
+  document.getElementById('nb-today').textContent  = done+'/7';
+  document.getElementById('nb-today').style.background = done===7?'var(--accent)':done>=4?'var(--amber-bg)':'var(--bg4)';
+  document.getElementById('nb-today').style.color = done===7?'#0e0f11':done>=4?'var(--amber)':'var(--text3)';
+}
+
+function toggleDtype() {
+  const k = 'dtype-'+todayKey();
+  const next = (localStorage.getItem(k)||'thuis')==='thuis'?'rdam':'thuis';
+  localStorage.setItem(k,next);
+  const btn = document.getElementById('dtype-btn');
+  btn.className = 'dtype-btn '+next;
+  btn.textContent = next==='thuis'?'Thuisdag':'Rotterdam dag';
+}
+
+// ═══════════════════════ HABITS ═══════════════════════
+function renderHabits() {
+  const day = getDay(selectedDate);
+  const list = document.getElementById('habit-list');
+  list.innerHTML = '';
+  let done = 0;
+  HABITS.forEach(h => {
+    const checked = !!day.habits[h.id];
+    if(checked) done++;
+    const row = document.createElement('div');
+    row.className = 'habit-row'+(checked?' done':'');
+    row.innerHTML = `<div class="habit-check">${checked?'✓':''}</div><div class="habit-name">${h.name}</div><div class="habit-target">${h.target}</div>`;
+    row.onclick = () => { day.habits[h.id]=!day.habits[h.id]; saveData(); renderHabits(); updateTodayScore(); renderWeekStrip(); renderStreaks(); renderFocusList(); };
+    list.appendChild(row);
+  });
+  const b = document.getElementById('habit-badge');
+  b.textContent = `${done} / 7`;
+  b.className = 'badge '+(done===7?'b-green':done>=4?'b-amber':'b-red');
+}
+
+// ═══════════════════════ WORKOUTS ═══════════════════════
+function renderWorkouts() {
+  const day = getDay(selectedDate);
+  const grid = document.getElementById('workout-grid');
+  grid.innerHTML = '';
+  WORKOUTS.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'wbtn'+(day.workout===w.id?' '+w.cls:'');
+    btn.textContent = w.label;
+    btn.onclick = () => { day.workout=day.workout===w.id?null:w.id; saveData(); renderWorkouts(); renderWeekStrip(); };
+    grid.appendChild(btn);
+  });
+}
+
+// ═══════════════════════ METRICS ═══════════════════════
+function renderMetrics() {
+  const day = getDay(selectedDate);
+  const grid = document.getElementById('metrics-grid');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr;gap:0';
+  grid.innerHTML = '';
+
+  const makeGroup = (label, ids) => {
+    const gw = document.createElement('div');
+    gw.innerHTML = `<div style="font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin:12px 0 8px;">${label}</div>`;
+    const inner = document.createElement('div');
+    inner.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;';
+    ids.forEach(id => {
+      const m = METRICS_DEF.find(x=>x.id===id); if(!m) return;
+      const val = day.metrics[m.id]||0;
+      const pct = Math.min(100,Math.round(val/m.goal*100));
+      const bc = pct>=100?'var(--accent)':pct>=70?'var(--blue)':'var(--border2)';
+      const w = document.createElement('div');
+      w.className = 'metric-wrap';
+      w.innerHTML = `<div class="metric-lbl">${m.label}</div><div class="metric-row-in"><input type="number" min="0" max="${m.max}" step="${m.id==='water_l'?0.1:1}" value="${val||''}" placeholder="0" id="metric-${m.id}"><span class="metric-unit-lbl">${m.unit}</span></div><div class="mbar"><div class="mbar-fill" id="bar-${m.id}" style="width:${pct}%;background:${bc}"></div></div>`;
+      w.querySelector('input').addEventListener('input', e => {
+        day.metrics[m.id] = parseFloat(e.target.value)||0;
+        if(m.id==='protein_g') { day.habits.protein=day.metrics.protein_g>=160; renderHabits(); updateTodayScore(); }
+        saveData();
+        const p = Math.min(100,Math.round(day.metrics[m.id]/m.goal*100));
+        const bar = document.getElementById('bar-'+m.id);
+        if(bar) { bar.style.width=p+'%'; bar.style.background=p>=100?'var(--accent)':p>=70?'var(--blue)':'var(--border2)'; }
+      });
+      inner.appendChild(w);
+    });
+    gw.appendChild(inner);
+    return gw;
+  };
+  grid.appendChild(makeGroup('Lichaamsmetrics',['protein_g','water_l','sleep_h','steps']));
+  grid.appendChild(makeGroup('Macros (Chronometer)',['kcal','carbs_g','fat_g','fiber_g']));
+}
+
+// ═══════════════════════ WEEK STRIP ═══════════════════════
+function getWeekDates() {
+  const today = new Date(); const dow = today.getDay();
+  const mon = new Date(today); mon.setDate(today.getDate()-((dow+6)%7));
+  return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return dateKey(d); });
+}
+
+function renderWeekStrip() {
+  const strip = document.getElementById('week-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+  const today = todayKey();
+  getWeekDates().forEach(key => {
+    const d = new Date(key+'T12:00:00');
+    const dayData = data.days[key]||{};
+    const habits = dayData.habits||{};
+    const div = document.createElement('div');
+    div.className = 'week-day'+(key===today?' today':'')+(key===selectedDate?' selected':'');
+    const dots = HABITS.map(h=>`<div class="dot${habits[h.id]?' on':''}"></div>`).join('');
+    const w = dayData.workout;
+    const wTag = w?`<div class="wwtag" style="background:${W_BG[w]||'#26292f'};color:${W_COLOR[w]||'#5a5f6b'}">${WORKOUTS.find(x=>x.id===w)?.label||w}</div>`:'';
+    div.innerHTML = `<div class="wdn">${DAYS_NL[d.getDay()]}</div><div class="wdd">${d.getDate()}</div><div class="wdots">${dots}</div>${wTag}`;
+    div.onclick = () => { selectedDate=key; renderWeekStrip(); renderHabits(); renderWorkouts(); renderMetrics(); };
+    strip.appendChild(div);
+  });
+}
+
+// ═══════════════════════ STREAKS ═══════════════════════
+function renderStreaks() {
+  const sg = document.getElementById('streak-grid');
+  if (!sg) return;
+  sg.innerHTML = '';
+  HABITS.slice(0,4).forEach(h => {
+    let streak = 0, d = new Date();
+    while(true) {
+      const k = dateKey(d);
+      if((data.days[k]||{}).habits?.[h.id]) { streak++; d.setDate(d.getDate()-1); } else break;
+    }
+    sg.innerHTML += `<div class="streak-item"><div class="streak-num">${streak}</div><div><div class="streak-name">${h.name}</div><div class="streak-sub">${streak===1?'dag':'dagen'} streak</div></div></div>`;
+  });
+}
+
+// ═══════════════════════ WEEK CHART ═══════════════════════
+function renderWeekChart() {
+  const dates = getWeekDates();
+  const labels = dates.map(k=>{ const d=new Date(k+'T12:00:00'); return DAYS_NL[d.getDay()]; });
+  const vals   = dates.map(k=>HABITS.filter(h=>(data.days[k]||{}).habits?.[h.id]).length);
+  const ctx = document.getElementById('weekChart');
+  if (!ctx) return;
+  if (charts.week) charts.week.destroy();
+  charts.week = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ data:vals, backgroundColor:'rgba(200,240,96,0.7)', borderColor:'#c8f060', borderWidth:1, borderRadius:4 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+      scales:{ x:{ grid:{color:'#2e3138'}, ticks:{color:'#5a5f6b',font:{family:'DM Mono',size:11}} },
+               y:{ min:0, max:7, grid:{color:'#2e3138'}, ticks:{color:'#5a5f6b',font:{family:'DM Mono',size:11}} } } }
+  });
+}
+
+// ═══════════════════════ WEEK PROGRESS ═══════════════════════
+function renderWeekProgress() {
+  const el = document.getElementById('week-progress-bars');
+  if (!el) return;
+  const dates = getWeekDates();
+  el.innerHTML = '';
+  HABITS.forEach(h => {
+    const n = dates.filter(k=>(data.days[k]||{}).habits?.[h.id]).length;
+    const pct = Math.min(100,Math.round(n/7*100));
+    el.innerHTML += `<div class="prog-row"><div class="prog-lbl">${h.name}</div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div><div class="prog-pct">${n}/7</div></div>`;
+  });
+}
+
+// ═══════════════════════ HEATMAP ═══════════════════════
+function renderHeatmap() {
+  const now = new Date(); const y=now.getFullYear(), m=now.getMonth();
+  document.getElementById('heatmap-month-label').textContent = MONTHS_NL[m]+' '+y;
+  document.getElementById('maand-sub').textContent = MONTHS_NL[m]+' '+y;
+  const firstDay = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const grid = document.getElementById('heatmap-grid');
+  grid.innerHTML = '';
+  for(let i=0;i<firstDay;i++) { const e=document.createElement('div'); e.className='hmap-cell empty'; grid.appendChild(e); }
+  for(let d=1;d<=daysInMonth;d++) {
+    const key = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const done = HABITS.filter(h=>(data.days[key]||{}).habits?.[h.id]).length;
+    const cls = done===0?'':done<=2?'l1':done<=5?'l2':'l3';
+    const cell = document.createElement('div');
+    cell.className = 'hmap-cell '+cls;
+    cell.title = `${d} ${MONTHS_NL[m]}: ${done}/7`;
+    grid.appendChild(cell);
+  }
+}
+
+// ═══════════════════════ PROTEIN CHART ═══════════════════════
+function renderProteinChart() {
+  const labels=[], vals=[];
+  for(let i=29;i>=0;i--) {
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const k=dateKey(d);
+    labels.push(d.getDate()+'/'+(d.getMonth()+1));
+    vals.push((data.days[k]||{}).metrics?.protein_g||0);
+  }
+  const ctx = document.getElementById('proteinChart');
+  if (!ctx) return;
+  if (charts.protein) charts.protein.destroy();
+  charts.protein = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[{ data:vals, borderColor:'#c8f060', backgroundColor:'rgba(200,240,96,0.08)', borderWidth:2, fill:true, tension:0.3, pointRadius:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+      scales:{ x:{ grid:{color:'#2e3138'}, ticks:{color:'#5a5f6b',font:{family:'DM Mono',size:10},maxTicksLimit:6} },
+               y:{ min:0, grid:{color:'#2e3138'}, ticks:{color:'#5a5f6b',font:{family:'DM Mono',size:10}} } } }
+  });
+}
+
+// ═══════════════════════ MONTH SUMMARY ═══════════════════════
+function renderMonthSummary() {
+  const now=new Date(); const y=now.getFullYear(), m=now.getMonth();
+  const days=new Date(y,m+1,0).getDate();
+  const counts={};
+  WORKOUTS.forEach(w=>counts[w.id]=0);
+  for(let d=1;d<=days;d++) {
+    const k=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const w=(data.days[k]||{}).workout;
+    if(w&&counts[w]!==undefined) counts[w]++;
+  }
+  const el=document.getElementById('month-workout-summary');
+  el.innerHTML='';
+  WORKOUTS.forEach(w => {
+    if(!counts[w.id]) return;
+    el.innerHTML+=`<div class="prog-row"><div class="prog-lbl" style="color:${W_COLOR[w.id]}">${w.label}</div><div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,counts[w.id]/5*100)}%;background:${W_COLOR[w.id]}"></div></div><div class="prog-pct">${counts[w.id]}x</div></div>`;
+  });
+  if(!el.innerHTML) el.innerHTML='<div style="font-size:13px;color:var(--text3);font-family:var(--mono);">Nog geen trainingen gelogd deze maand.</div>';
+}
+
+// ═══════════════════════ PLAN ═══════════════════════
+const COLOR_MAP = {
+  blue:  ['var(--blue-bg)',   'var(--blue)'],
+  green: ['var(--green-bg)',  'var(--green)'],
+  amber: ['var(--amber-bg)',  'var(--amber)'],
+  purple:['var(--purple-bg)', 'var(--purple)'],
+  gray:  ['var(--bg4)',       'var(--text3)'],
+};
+
+function renderPlan() {
+  if (!selectedPlanSession) selectedPlanSession='upper_a';
+  const grid=document.getElementById('plan-week-grid');
+  grid.innerHTML='';
+  WEEK_PLAN.forEach(w => {
+    const [bg,fg]=COLOR_MAP[w.color]||COLOR_MAP.gray;
+    const isSel=w.session===selectedPlanSession;
+    const typeLabel=w.session==='rest'?'rust':(w.color==='blue'||w.color==='green')?'gym':'cardio';
+    const div=document.createElement('div');
+    div.className='plan-cell'+(isSel?' sel':'');
+    div.innerHTML=`<div class="pc-day">${w.day}</div><div class="pc-name">${w.label}</div><div style="background:${bg};color:${fg};font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px;">${typeLabel}</div>`;
+    div.onclick=()=>{ selectedPlanSession=w.session; renderPlan(); };
+    grid.appendChild(div);
+  });
+
+  const detail=document.getElementById('plan-detail');
+  const s=PLAN_SESSIONS[selectedPlanSession];
+  if(!s){detail.innerHTML='';return;}
+  const [,titleColor]=COLOR_MAP[s.color]||COLOR_MAP.gray;
+
+  let html=`<div class="card fw"><div class="card-title"><span><span class="ctd" style="background:${titleColor}"></span>${s.title}</span></div><div class="plan-note">${s.note}</div>`;
+
+  if(s.exercises){
+    html+=`<table class="ex-table"><thead><tr><th style="width:24px">#</th><th>Oefening</th><th style="text-align:right">Sets × reps</th><th style="width:220px">Notitie</th></tr></thead><tbody>`;
+    s.exercises.forEach((ex,i)=>{
+      html+=`<tr><td class="ex-num">${i+1}</td><td style="font-weight:500;color:var(--text)">${ex.name}</td><td class="ex-sets">${ex.sets}</td><td class="ex-note">${ex.note}</td></tr>`;
+    });
+    html+=`</tbody></table>`;
+  }
+  if(s.runBlocks){
+    html+=`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:10px;">`;
+    s.runBlocks.forEach(rb=>{
+      html+=`<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);"><span style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${rb.icon}</span><span style="font-size:13px;font-weight:500;flex:1;">${rb.label}</span><span style="font-family:var(--mono);font-size:13px;color:${titleColor}">${rb.value}</span></div>`;
+    });
+    html+=`</div>`;
+  }
+  if(s.restItems){
+    html+=`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:10px;">`;
+    s.restItems.forEach(item=>{html+=`<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)">${item}</div>`;});
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+  detail.innerHTML=html;
+}
+
+// ═══════════════════════ IMPORT/EXPORT ═══════════════════════
+function log(msg) {
+  const el=document.getElementById('import-log');
+  if(!el) return;
+  el.innerHTML+=(el.innerHTML?'\n':'')+new Date().toLocaleTimeString()+' — '+msg;
+  el.scrollTop=el.scrollHeight;
+}
+
+function handleGarminImport(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const lines=ev.target.result.split('\n'); let count=0;
+    lines.slice(1).forEach(line=>{
+      const cols=line.split(','); if(cols.length<5) return;
+      const dateRaw=cols[1]?.replace(/"/g,'').trim(); if(!dateRaw) return;
+      const d=new Date(dateRaw); if(isNaN(d)) return;
+      const key=dateKey(d);
+      const type=(cols[2]||'').replace(/"/g,'').trim().toLowerCase();
+      let wId=null;
+      if(type.includes('run')) wId='run1';
+      else if(type.includes('cycl')||type.includes('bike')||type.includes('ride')) wId='bike';
+      else if(type.includes('strength')||type.includes('workout')) wId='upper_a';
+      if(wId){getDay(key).workout=wId; count++;}
+    });
+    saveData(); log(`Garmin: ${count} activiteiten geïmporteerd.`);
+  };
+  reader.readAsText(file);
+}
+
+function handleChronoImport(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const lines=ev.target.result.split('\n'); let count=0;
+    lines.slice(1).forEach(line=>{
+      const cols=line.split(','); if(cols.length<3) return;
+      const dateRaw=cols[0]?.replace(/"/g,'').trim(); if(!dateRaw) return;
+      const d=new Date(dateRaw); if(isNaN(d)) return;
+      const key=dateKey(d); const day=getDay(key);
+      const energy=parseFloat(cols[1])||0, protein=parseFloat(cols[2])||0;
+      const carbs=parseFloat(cols[3])||0, fat=parseFloat(cols[4])||0, fiber=parseFloat(cols[5])||0;
+      if(energy) day.metrics.kcal=Math.round(energy);
+      if(protein){day.metrics.protein_g=Math.round(protein); day.habits.protein=protein>=160;}
+      if(carbs) day.metrics.carbs_g=Math.round(carbs);
+      if(fat) day.metrics.fat_g=Math.round(fat);
+      if(fiber) day.metrics.fiber_g=Math.round(fiber);
+      count++;
+    });
+    saveData(); log(`Chronometer: ${count} dagboekregels geïmporteerd.`);
+  };
+  reader.readAsText(file);
+}
+
+function exportJSON() {
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='fitdash-backup-'+todayKey()+'.json'; a.click();
+}
+function importJSON(){ document.getElementById('json-import-input').click(); }
+function handleJSONImport(e) {
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{data=JSON.parse(ev.target.result); if(!data.days) data.days={}; saveData(); log('JSON geïmporteerd.'); renderToday(); updateTodayScore();}
+    catch(err){log('Fout bij importeren.');}
+  };
+  r.readAsText(file);
+}
+function exportCSV() {
+  let csv='Datum,Water,Eiwit,Stappen,Slaap,Training\n';
+  Object.keys(data.days).sort().forEach(k=>{
+    const d=data.days[k];
+    csv+=`${k},${d.metrics?.water_l||0},${d.metrics?.protein_g||0},${d.metrics?.steps||0},${d.metrics?.sleep_h||0},${d.workout||''}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fitdash-'+todayKey()+'.csv'; a.click();
+}
+function clearData() {
+  if(confirm('Weet je zeker dat je alle data wilt wissen?')){data={days:{}}; saveData(); log('Data gewist.'); renderToday();}
+}
+
+// ═══════════════════════ REVIEW ═══════════════════════
+function saveReview() {
+  const rv={
+    sport:document.getElementById('rv-sport').value,
+    spaans:document.getElementById('rv-spaans').value,
+    invest:document.getElementById('rv-invest').value,
+    lezen:document.getElementById('rv-lezen').value,
+    blok:document.getElementById('rv-blok').value,
+    p1:document.getElementById('rv-p1').value,
+    p2:document.getElementById('rv-p2').value,
+    p3:document.getElementById('rv-p3').value,
+    date:todayKey()
+  };
+  localStorage.setItem('review-'+todayKey(),JSON.stringify(rv));
+  const s=document.getElementById('rv-saved');
+  s.style.display='inline'; setTimeout(()=>s.style.display='none',2500);
+}
+
+// ═══════════════════════ BOOKS ═══════════════════════
+function addBook() {
+  const input=document.getElementById('new-book');
+  const val=input.value.trim(); if(!val) return;
+  const books=JSON.parse(localStorage.getItem('extra-books')||'[]');
+  books.push(val); localStorage.setItem('extra-books',JSON.stringify(books));
+  input.value=''; renderBooks();
+}
+function renderBooks() {
+  const books=JSON.parse(localStorage.getItem('extra-books')||'[]');
+  const list=document.getElementById('book-list');
+  list.querySelectorAll('.extra-book').forEach(e=>e.remove());
+  books.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='rule-item extra-book'; div.style.padding='10px 0';
+    div.innerHTML=`<div><div class="rule-t">${b}</div></div>`;
+    list.appendChild(div);
+  });
+}
+
+// ═══════════════════════ UTILS ═══════════════════════
+function getWeekNum(d) {
+  const date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));
+  const ys=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil(((date-ys)/86400000+1)/7);
+}
+
+// ═══════════════════════ INIT ═══════════════════════
+loadData();
+renderToday();
+renderHabits();
+renderWorkouts();
+renderMetrics();
+renderBooks();
+</script>
+</body>
+</html>
