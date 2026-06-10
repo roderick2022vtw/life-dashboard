@@ -298,10 +298,42 @@ textarea.review-input{height:90px;resize:vertical;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  z-index:100;padding-bottom:env(safe-area-inset-bottom);
+}
+.bnav-items{display:flex;justify-content:space-around;}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 2px;border:none;background:none;color:var(--text3);
+  font-size:9px;font-family:var(--mono);cursor:pointer;
+  transition:color .15s;letter-spacing:.04em;text-transform:uppercase;line-height:1;
+}
+.bnav-item:active{opacity:.7;}
+.bnav-item.active{color:var(--accent);}
+.bnav-icon{font-size:18px;margin-bottom:2px;display:block;}
+.mob-menu{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);}
+.mob-menu.open{display:block;}
+.mob-menu-panel{
+  position:absolute;bottom:68px;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  border-radius:16px 16px 0 0;padding:16px 12px;
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;
+}
+.mob-menu-item{
+  display:flex;align-items:center;gap:10px;padding:12px 10px;
+  border-radius:var(--r);border:none;background:var(--bg3);
+  color:var(--text2);font-size:13px;font-weight:500;
+  cursor:pointer;font-family:var(--font);width:100%;text-align:left;
+}
+.mob-menu-item:active{background:var(--bg4);}
 @media(max-width:700px){
   .sidebar{display:none;}
   .page{padding:16px;}
   .g2,.g3,.g4{grid-template-columns:1fr;}
+  .main{padding-bottom:68px;}
+  .bottom-nav{display:flex;}
 }
 </style>
 </head>
@@ -648,20 +680,42 @@ textarea.review-input{height:90px;resize:vertical;}
       <div class="rule-item"><div class="rule-n">4</div><div><div class="rule-t">Harde stop om 17:00</div><div class="rule-s">Geen "nog even". Onafgemaakt werk staat morgen als eerste taak.</div></div></div>
       <div class="rule-item"><div class="rule-n">5</div><div><div class="rule-t">Miste dag = reset, niet inhalen</div><div class="rule-s">Dubbel doen leidt tot uitputting.</div></div></div>
     </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6;">
+      <strong style="color:var(--accent);">Atomic Habits (James Clear)</strong> — Gewoontes worden gevormd via: <strong style="color:var(--text)">Cue → Craving → Response → Reward</strong>. Bouw goede gewoontes: maak ze zichtbaar, aantrekkelijk, makkelijk en bevredigend. Breek slechte gewoontes: maak ze onzichtbaar, onaantrekkelijk, moeilijk en onbevredigend. Identiteit: word iemand die <em>al</em> sport, leest en leert — niet iemand die er naartoe werkt.
+    </div>
     <div class="g2" style="margin-top:0">
       <div class="card">
         <div class="card-title"><span><span class="ctd"></span>Habit stacking</span></div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Na [huidige gewoonte] doe ik [nieuwe gewoonte]</div>
         <div class="rule-item"><div><div class="rule-t">Na koffie zetten</div><div class="rule-s">→ Duolingo (5 min)</div></div></div>
         <div class="rule-item"><div><div class="rule-t">Na training</div><div class="rule-s">→ Douche + boek bij ontbijt</div></div></div>
         <div class="rule-item"><div><div class="rule-t">Na lunch</div><div class="rule-s">→ Spaans met Claude</div></div></div>
         <div class="rule-item"><div><div class="rule-t">Na laptop dicht</div><div class="rule-s">→ Wandeling of Nico</div></div></div>
+        <div class="rule-item"><div><div class="rule-t">Na opstaan</div><div class="rule-s">→ Direct naar buiten / raam open — geen telefoon</div></div></div>
       </div>
       <div class="card">
-        <div class="card-title"><span><span class="ctd"></span>Wrijving verlagen</span></div>
+        <div class="card-title"><span><span class="ctd"></span>Wrijving verlagen (goede gewoontes)</span></div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Verminder stappen tussen jou en je goede gewoonte</div>
         <div class="rule-item"><div><div class="rule-t">Sportkleren klaarleggen</div><div class="rule-s">Avond ervoor. Geen zoeken 's ochtends.</div></div></div>
         <div class="rule-item"><div><div class="rule-t">Boek naast bed</div><div class="rule-s">Niet telefoon. Fysiek bereikbaar.</div></div></div>
         <div class="rule-item"><div><div class="rule-t">Podcast app als startscherm</div><div class="rule-s">Acquired direct beschikbaar op telefoon.</div></div></div>
         <div class="rule-item"><div><div class="rule-t">Laptop op bureau</div><div class="rule-s">Niet op de bank. Signaleer werkmodus.</div></div></div>
+      </div>
+    </div>
+    <div class="card fw" style="margin-top:0;border-left:2px solid var(--red,#f87171);">
+      <div class="card-title"><span><span class="ctd"></span>Instagram blokkeren — maak het moeilijk</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Atomic Habits: verhoog de wrijving tussen jou en slechte gewoontes. Elke extra stap = minder gebruik.</div>
+      <div class="g2" style="margin-bottom:0">
+        <div>
+          <div class="rule-item"><div><div class="rule-t">Verwijder van startscherm</div><div class="rule-s">Zet op pagina 3+. Elke swipe = bewuste keuze.</div></div></div>
+          <div class="rule-item"><div><div class="rule-t">Telefoon uit de kamer tijdens deep work</div><div class="rule-s">Cue verwijderen = craving stopt vanzelf.</div></div></div>
+          <div class="rule-item"><div><div class="rule-t">Grijstint aan zetten</div><div class="rule-s">Instellingen → Toegankelijkheid → Grijstint. Feed wordt saai.</div></div></div>
+        </div>
+        <div>
+          <div class="rule-item"><div><div class="rule-t">App-timer instellen</div><div class="rule-s">15 min/dag. Schermtijd → App-limieten. Telefoon blokkeert daarna.</div></div></div>
+          <div class="rule-item"><div><div class="rule-t">Geen Instagram voor 10:00</div><div class="rule-s">Ochtend is voor jou. Regel: eerst taak af, dan mag je kijken.</div></div></div>
+          <div class="rule-item"><div><div class="rule-t">Notificaties volledig uit</div><div class="rule-s">Geen rode bolletjes = geen cue = geen drang.</div></div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -807,7 +861,7 @@ const PLAN_SESSIONS = {
     title:'Upper — combi druk + trek (volume)', color:'purple',
     note:'Afsluiter van de werkweek. Iets lichter van gewicht, hogere reps. Geen zware compounds — die zitten al op ma en wo.',
     exercises:[
-      { name:'Incline DB press',       sets:'3 × 10–12', note:'30°, schouderbladen ingetrokken' },
+      { name:'Incline machine chest press', sets:'3 × 10–12', note:'Geleid, lichter als afsluiter — schouderbladen ingetrokken' },
       { name:'Cable row (seated)',     sets:'3 × 10–12', note:'Rug stimulus zonder zware compound' },
       { name:'DB lateral raise',       sets:'3 × 15',    note:'Schouders, licht en gecontroleerd' },
       { name:'Pull-up / lat machine',  sets:'3 × 8–10',  note:'Breedte, volle ROM' },
@@ -899,11 +953,18 @@ function goto(id) {
   document.querySelectorAll('.nav-item').forEach(n => {
     if ((n.getAttribute('onclick')||'').includes("'"+id+"'")) n.classList.add('active');
   });
+  document.querySelectorAll('.bnav-item').forEach(n => {
+    const oc = n.getAttribute('onclick') || '';
+    if (oc.includes("goto('"+id+"')")) n.classList.add('active');
+    else n.classList.remove('active');
+  });
   if (id==='habits') { renderHabits(); renderWorkouts(); renderMetrics(); }
   if (id==='week')   { renderWeekStrip(); renderStreaks(); renderWeekChart(); renderWeekProgress(); }
   if (id==='maand')  { renderHeatmap(); renderProteinChart(); renderMonthSummary(); }
   if (id==='plan')   renderPlan();
 }
+function openMobMenu()  { document.getElementById('mob-menu').classList.add('open'); }
+function closeMobMenu() { document.getElementById('mob-menu').classList.remove('open'); }
 
 function swTab(btn, tcId, tabsId) {
   document.getElementById(tabsId).querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -1412,5 +1473,28 @@ renderWorkouts();
 renderMetrics();
 renderBooks();
 </script>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bnav-items">
+    <button class="bnav-item active" onclick="goto('today')"><span class="bnav-icon">🏠</span>Vandaag</button>
+    <button class="bnav-item" onclick="goto('habits')"><span class="bnav-icon">✅</span>Habits</button>
+    <button class="bnav-item" onclick="goto('plan')"><span class="bnav-icon">💪</span>Plan</button>
+    <button class="bnav-item" onclick="goto('dagstructuur')"><span class="bnav-icon">📋</span>Systeem</button>
+    <button class="bnav-item" onclick="openMobMenu()"><span class="bnav-icon">☰</span>Meer</button>
+  </div>
+</div>
+<div id="mob-menu" class="mob-menu" onclick="closeMobMenu()">
+  <div class="mob-menu-panel" onclick="event.stopPropagation()">
+    <button class="mob-menu-item" onclick="goto('week');closeMobMenu()">📅 Week</button>
+    <button class="mob-menu-item" onclick="goto('maand');closeMobMenu()">📊 Maand</button>
+    <button class="mob-menu-item" onclick="goto('spaans');closeMobMenu()">🇪🇸 Spaans</button>
+    <button class="mob-menu-item" onclick="goto('investing');closeMobMenu()">💰 Investeren</button>
+    <button class="mob-menu-item" onclick="goto('reading');closeMobMenu()">📚 Lezen</button>
+    <button class="mob-menu-item" onclick="goto('review');closeMobMenu()">🔄 Review</button>
+    <button class="mob-menu-item" onclick="goto('doelen');closeMobMenu()">🎯 Doelen</button>
+    <button class="mob-menu-item" onclick="goto('import');closeMobMenu()">📥 Import</button>
+  </div>
+</div>
 </body>
 </html>
