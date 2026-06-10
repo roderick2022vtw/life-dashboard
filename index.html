@@ -1295,7 +1295,8 @@ function renderPlan() {
   WEEK_PLAN.forEach(w => {
     const [bg,fg]=COLOR_MAP[w.color]||COLOR_MAP.gray;
     const isSel=w.session===selectedPlanSession;
-    const typeLabel=w.session==='rest'?'rust':(w.color==='blue'||w.color==='green')?'gym':'cardio';
+    const GYM=['push','pull','legs','upper','upper_a','upper_b','lower_a','lower_b'];
+    const typeLabel=w.session==='rest'?'rust':GYM.includes(w.session)?'gym':w.session==='bike'?'flex':'cardio';
     const div=document.createElement('div');
     div.className='plan-cell'+(isSel?' sel':'');
     div.innerHTML=`<div class="pc-day">${w.day}</div><div class="pc-name">${w.label}</div><div style="background:${bg};color:${fg};font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px;">${typeLabel}</div>`;
