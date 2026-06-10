@@ -730,18 +730,17 @@ const HABITS = [
 ];
 
 const WORKOUTS = [
-  { id:'upper_a', label:'Upper A', cls:'au' },
-  { id:'upper_b', label:'Upper B', cls:'au' },
-  { id:'lower_a', label:'Lower A', cls:'al' },
-  { id:'lower_b', label:'Lower B', cls:'al' },
-  { id:'run1',    label:'Run 1',   cls:'ar' },
-  { id:'run2',    label:'Run 2',   cls:'ar' },
-  { id:'bike',    label:'Fiets / Kiten', cls:'ab' },
-  { id:'rest',    label:'Rust',    cls:'ax' },
+  { id:'push',  label:'Push',         cls:'au' },
+  { id:'pull',  label:'Pull',         cls:'at' },
+  { id:'legs',  label:'Legs',         cls:'al' },
+  { id:'upper', label:'Upper',        cls:'av' },
+  { id:'run1',  label:'Run',          cls:'ar' },
+  { id:'bike',  label:'Flex / Kiten', cls:'ab' },
+  { id:'rest',  label:'Rust',         cls:'ax' },
 ];
 
-const W_COLOR = { upper_a:'#5b9cf6',upper_b:'#5b9cf6',lower_a:'#4ade80',lower_b:'#4ade80',run1:'#fbbf24',run2:'#fbbf24',bike:'#a78bfa',rest:'#5a5f6b' };
-const W_BG    = { upper_a:'#1a2535',upper_b:'#1a2535',lower_a:'#0d2318',lower_b:'#0d2318',run1:'#231a07',run2:'#231a07',bike:'#1a1530',rest:'#26292f' };
+const W_COLOR = { push:'#5b9cf6',pull:'#2dd4bf',legs:'#4ade80',upper:'#818cf8',run1:'#fbbf24',bike:'#a78bfa',rest:'#5a5f6b' };
+const W_BG    = { push:'#1a2535',pull:'#0d1f1e',legs:'#0d2318',upper:'#1a1a35',run1:'#231a07',bike:'#1a1530',rest:'#26292f' };
 
 const METRICS_DEF = [
   { id:'protein_g', label:'Eiwit',        unit:'g',    max:250,  goal:160,  group:'body' },
@@ -758,63 +757,63 @@ const DAYS_NL = ['zo','ma','di','wo','do','vr','za'];
 const MONTHS_NL = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
 
 const WEEK_PLAN = [
-  { day:'Ma', session:'upper_a', label:'Upper A',            color:'blue' },
-  { day:'Di', session:'run1',    label:'Run 1',              color:'amber' },
-  { day:'Wo', session:'lower_a', label:'Lower A',            color:'green' },
-  { day:'Do', session:'upper_b', label:'Upper B',            color:'blue' },
-  { day:'Vr', session:'lower_b', label:'Lower B',            color:'green' },
-  { day:'Za', session:'bike',    label:'Rust / Kiten / Ride',color:'purple' },
-  { day:'Zo', session:'run2',    label:'Run 2 / Rust',       color:'amber' },
+  { day:'Ma', session:'push',  label:'Push',              color:'blue' },
+  { day:'Di', session:'run1',  label:'Run — Zone 2',      color:'amber' },
+  { day:'Wo', session:'pull',  label:'Pull',              color:'teal' },
+  { day:'Do', session:'legs',  label:'Legs',              color:'green' },
+  { day:'Vr', session:'upper', label:'Upper',             color:'purple' },
+  { day:'Za', session:'bike',  label:'Flex / Kiten / Ride',color:'purple' },
+  { day:'Zo', session:'rest',  label:'Rust',              color:'gray' },
 ];
 
 const PLAN_SESSIONS = {
-  upper_a: {
-    title:'Upper A — druk + trek (kracht)', color:'blue',
-    note:'Zwaarste upper dag. Compound-first, focus op progressie in gewicht. Log alles in Hevy direct na afloop.',
+  push: {
+    title:'Push — borst, schouders, triceps', color:'blue',
+    note:'Zwaarste drukdag. Compound-first, focus op progressie in gewicht. Log alles in Hevy direct na afloop.',
     exercises:[
       { name:'Barbell bench press',  sets:'4 × 5–6',   note:'Volle ROM, gecontroleerd omlaag' },
-      { name:'Pendlay row',          sets:'4 × 5–6',   note:'Borst parallel aan grond' },
-      { name:'Overhead press (DB)',  sets:'3 × 8–10',  note:'Strikte vorm, geen momentum' },
-      { name:'Cable lat pulldown',   sets:'3 × 10–12', note:'Schouderbladen samentrekken' },
-      { name:'Incline DB curl',      sets:'3 × 12',    note:'Volledige stretch onderaan' },
+      { name:'Overhead press (DB)',  sets:'4 × 8–10',  note:'Strikte vorm, geen momentum' },
+      { name:'Incline DB press',     sets:'3 × 10–12', note:'30° bank, schouderbladen ingetrokken' },
+      { name:'DB lateral raise',     sets:'3 × 15',    note:'Lichte gewichten, gecontroleerd' },
       { name:'Triceps pushdown',     sets:'3 × 12',    note:'Ellebogen gefixeerd' },
+      { name:'Dips',                 sets:'3 × 10–12', note:'Licht voorover voor borst' },
     ]
   },
-  upper_b: {
-    title:'Upper B — volume', color:'blue',
-    note:'Volume dag — hogere reps, meer sets per spiergroep. Iets minder gewicht dan Upper A, meer totale stimulus.',
+  pull: {
+    title:'Pull — rug, biceps', color:'teal',
+    note:'Trek dag. Pendlay row is het compound fundament — explosief omhoog, gecontroleerd omlaag. Log alles in Hevy.',
     exercises:[
-      { name:'Incline DB press',       sets:'4 × 8–10',  note:'30° bank, schouderbladen ingetrokken' },
-      { name:'Cable row (seated)',     sets:'4 × 10–12', note:'Ellebogen langs het lichaam' },
-      { name:'DB lateral raise',      sets:'3 × 15',    note:'Lichte gewichten, controlled' },
-      { name:'Pull-up / lat machine', sets:'3 × 8–10',  note:'Volle ROM, langzaam omlaag' },
-      { name:'Face pull',             sets:'3 × 15',    note:'Hoog attachment, naar gezicht' },
-      { name:'EZ-bar curl',           sets:'3 × 12',    note:'' },
-      { name:'Dips',                  sets:'3 × 12',    note:'Licht voorover voor borst' },
+      { name:'Pendlay row',          sets:'4 × 5–6',   note:'Borst parallel aan grond, explosief' },
+      { name:'Pull-up / lat machine',sets:'4 × 8–10',  note:'Volle ROM, langzaam omlaag' },
+      { name:'Cable row (seated)',   sets:'3 × 10–12', note:'Ellebogen langs het lichaam' },
+      { name:'Face pull',            sets:'3 × 15',    note:'Hoog attachment, rotator cuff bescherming' },
+      { name:'EZ-bar curl',          sets:'3 × 12',    note:'' },
+      { name:'Incline DB curl',      sets:'3 × 12',    note:'Volledige stretch onderaan' },
     ]
   },
-  lower_a: {
-    title:'Lower A — squat-focus (kracht)', color:'green',
-    note:'Kracht dag. Back squat is het fundament — zorg voor goede opwarming (2 opwarmseries). Nordic curls zijn verplicht voor kniebescherming bij het hardlopen.',
+  legs: {
+    title:'Legs — quads, hamstrings, glutes', color:'green',
+    note:'Één beensessie per week — alles zit erin. Squat is het fundament. Geen conventionele deadlift (te zwaar na Pull gisteren). Nordic curl verplicht.',
     exercises:[
-      { name:'Back squat',         sets:'4 × 5–6',   note:'Hips below parallel, chest up' },
-      { name:'Romanian deadlift',  sets:'3 × 8–10',  note:'Hamstring stretch, lichte kniebuiging' },
-      { name:'Leg press',          sets:'3 × 10–12', note:'Voeten schouderbreedte' },
-      { name:'Leg curl (machine)', sets:'3 × 12',    note:'Gecontroleerd terug' },
-      { name:'Nordic curl',        sets:'3 × 6–8',   note:'⚠️ Verplicht — kniebescherming hardlopen' },
-      { name:'Calf raise',         sets:'4 × 15',    note:'Volledige ROM, pauze bovenaan' },
+      { name:'Back squat',           sets:'4 × 5–6',    note:'Hips below parallel, chest up' },
+      { name:'Romanian deadlift',    sets:'3 × 8–10',   note:'Hamstring stretch, lichte kniebuiging' },
+      { name:'Bulgarian split squat',sets:'3 × 10 p/b', note:'Achterbeen op bank, quad + glute' },
+      { name:'Leg curl (machine)',   sets:'3 × 12',     note:'Gecontroleerd terug' },
+      { name:'Nordic curl',          sets:'3 × 6–8',    note:'⚠️ Verplicht — kniebescherming hardlopen' },
+      { name:'Calf raise',           sets:'4 × 15',     note:'Volledige ROM, pauze bovenaan' },
     ]
   },
-  lower_b: {
-    title:'Lower B — deadlift-focus (hypertrofie)', color:'green',
-    note:'Deadlift is de anchor. Bulgarian split squat is zwaar op de quads — doe ze voor leg extension, niet erna.',
+  upper: {
+    title:'Upper — combi druk + trek (volume)', color:'purple',
+    note:'Afsluiter van de werkweek. Iets lichter van gewicht, hogere reps. Geen zware compounds — die zitten al op ma en wo.',
     exercises:[
-      { name:'Deadlift (conventional)',   sets:'4 × 5',      note:'Heupen laag, borst omhoog, neutrale rug' },
-      { name:'Bulgarian split squat',    sets:'3 × 10 p/b', note:'Achterbeen op bank, lang stride' },
-      { name:'Leg extension',            sets:'3 × 15',     note:'Licht gewicht, squeeze bovenaan' },
-      { name:'Glute bridge / hip thrust',sets:'3 × 12',     note:'Barbell of body weight' },
-      { name:'Nordic curl',              sets:'3 × 6–8',    note:'⚠️ Verplicht — kniebescherming hardlopen' },
-      { name:'Tibialis raise',           sets:'3 × 20',     note:'Hielen op verhoging, teen omhoog' },
+      { name:'Incline DB press',       sets:'3 × 10–12', note:'30°, schouderbladen ingetrokken' },
+      { name:'Cable row (seated)',     sets:'3 × 10–12', note:'Rug stimulus zonder zware compound' },
+      { name:'DB lateral raise',       sets:'3 × 15',    note:'Schouders, licht en gecontroleerd' },
+      { name:'Pull-up / lat machine',  sets:'3 × 8–10',  note:'Breedte, volle ROM' },
+      { name:'Face pull',              sets:'3 × 15',    note:'Rotator cuff, herstel' },
+      { name:'EZ-bar curl',            sets:'3 × 12',    note:'' },
+      { name:'Triceps pushdown',       sets:'3 × 12',    note:'Ellebogen gefixeerd' },
     ]
   },
   run1: {
@@ -1224,11 +1223,12 @@ const COLOR_MAP = {
   green: ['var(--green-bg)',  'var(--green)'],
   amber: ['var(--amber-bg)',  'var(--amber)'],
   purple:['var(--purple-bg)', 'var(--purple)'],
+  teal:  ['var(--teal-bg)',   'var(--teal)'],
   gray:  ['var(--bg4)',       'var(--text3)'],
 };
 
 function renderPlan() {
-  if (!selectedPlanSession) selectedPlanSession='upper_a';
+  if (!selectedPlanSession) selectedPlanSession='push';
   const grid=document.getElementById('plan-week-grid');
   grid.innerHTML='';
   WEEK_PLAN.forEach(w => {
