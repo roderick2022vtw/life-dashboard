@@ -1,7 +1,5 @@
-const CACHE = 'life-os-v1';
+const CACHE = 'life-os-v3';
 const ASSETS = [
-  '/life-dashboard/',
-  '/life-dashboard/index.html',
   '/life-dashboard/manifest.json',
   '/life-dashboard/icon.svg',
 ];
@@ -21,6 +19,14 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  if (e.request.mode === 'navigate' || e.request.url.endsWith('index.html') || e.request.url.endsWith('/life-dashboard/')) {
+    // Network-first voor HTML: altijd de nieuwste versie
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // Cache-first voor static assets (iconen, manifest)
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
